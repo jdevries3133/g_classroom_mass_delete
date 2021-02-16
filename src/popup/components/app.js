@@ -3,7 +3,6 @@ import React, { Fragment, useState } from "react";
 import { CheckList } from "./topic_list";
 
 export const App = () => {
-  console.log("render app");
   const [checked, setChecked] = useState({
     bananna: false,
     strawberry: false,
@@ -12,8 +11,7 @@ export const App = () => {
   });
 
   const checkedHandler = (itemName) => {
-    console.log("setState");
-    setChecked({ ...checked, [itemName]: !checked[itemName] });
+    setChecked({ [itemName]: !checked[itemName], ...checked });
   };
 
   return (
