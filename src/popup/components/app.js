@@ -1,26 +1,18 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment } from "react";
 
-import { CheckList } from "./topic_list";
+import { DeleteTopics } from "./topic_list";
 
 export const App = () => {
-  const [checked, setChecked] = useState({
-    bananna: false,
-    strawberry: false,
-    blueberry: false,
-    grape: false,
-  });
-
-  const checkedHandler = (itemName) => {
-    setChecked({ [itemName]: !checked[itemName], ...checked });
+  const onDelete = (topics) => {
+    // TODO: ask content script to do deletion.
   };
-
   return (
     <Fragment>
       <div>
         <h1>Hello, World</h1>
         <p>Check off some of our things!</p>
       </div>
-      <CheckList items={checked} checkedHandler={checkedHandler} />
+      <DeleteTopics deleteCallback={onDelete} />
     </Fragment>
   );
 };

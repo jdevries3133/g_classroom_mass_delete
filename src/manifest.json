@@ -8,7 +8,7 @@
   "content_scripts": [
     {
       "matches": ["https://classroom.google.com/*"],
-      "js": ["classroom_content_script.bundle.js"]
+      "js": ["foreground.bundle.js"]
     }
   ],
   "browser_action": {

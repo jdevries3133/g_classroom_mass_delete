@@ -20,11 +20,7 @@ module.exports = {
     popup: path.join(__dirname, "src", "popup", "index.js"),
     options: path.join(__dirname, "src", "options", "index.js"),
     background: path.join(__dirname, "src", "background", "index.js"),
-    classroom_content_script: path.join(
-      __dirname,
-      "src",
-      "classroom_content_script.js"
-    ),
+    foreground: path.join(__dirname, "src", "foreground.js"),
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -33,7 +29,6 @@ module.exports = {
   module: {
     rules: [
       {
-        // react js(x) files
         test: /\.js(x)?$/,
         exclude: /node_modules/,
         use: {
@@ -47,26 +42,6 @@ module.exports = {
         },
       },
       {
-        test: /\.css$/,
-        use: [
-          "style-loader",
-          {
-            loader: "css-loader",
-            options: {
-              importLoaders: 1,
-              modules: true,
-            },
-          },
-        ],
-        include: /\.module\.css$/,
-      },
-      {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"],
-        exclude: /\.module\.css$/,
-      },
-      {
-        // regular files, listed above
         test: new RegExp(".(" + fileExtensions.join("|") + ")$"),
         loader: "file-loader",
         options: {
