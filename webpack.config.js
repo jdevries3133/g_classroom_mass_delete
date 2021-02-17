@@ -20,7 +20,7 @@ module.exports = {
     popup: path.join(__dirname, "src", "popup", "index.js"),
     options: path.join(__dirname, "src", "options", "index.js"),
     background: path.join(__dirname, "src", "background", "index.js"),
-    foreground: path.join(__dirname, "src", "foreground.js"),
+    foreground: path.join(__dirname, "src", "foreground", "index.js"),
   },
   output: {
     path: path.join(__dirname, "build"),
