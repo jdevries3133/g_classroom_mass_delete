@@ -22,13 +22,13 @@ const Ul = styled.ul`
   }
 `;
 
-export const DeleteTopics = () => {
+export const DeleteTopics = (props) => {
   let [topics, setTopics] = useState([]);
+  let [checkboxState, setCheckboxState] = useState({});
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.sendMessage(tabs[0].id, { type: "getTopics" }, (response) => {
-        console.log(response);
-        setTopics(response);
+        response ? setTopics(response) : console.warn("Topics are undefined");
       });
     });
   }, []);
@@ -38,7 +38,17 @@ export const DeleteTopics = () => {
         {topics.map((i) => {
           return (
             <li key={i}>
-              <input type="checkbox" name={`selectItem${i}`} />
+              <input
+                type="checkbox"
+                name={`selectItem${i}`}
+                value={checkboxState[i]}
+                onChange={() => {
+                  setCheckboxState({
+                    ...checkboxState,
+                    [i]: !checkboxState[i],
+                  });
+                }}
+              />
               <label htmlFor={`selectItem${i}`} key={i}>
                 {i}
               </label>
@@ -46,6 +56,16 @@ export const DeleteTopics = () => {
           );
         })}
       </Ul>
+      <input
+        onClick={(e) => {
+          e.preventDefault();
+          props.deleteCallback(
+            Object.keys(checkboxState).filter((k) => checkboxState[k])
+          );
+        }}
+        type="submit"
+        value="Delete"
+      ></input>
     </form>
   );
 };

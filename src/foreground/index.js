@@ -20,6 +20,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse(topicNames);
 
     case "deleteTopics":
+      console.log(request.payload);
       deleteTopics(request.payload);
+      sendResponse();
   }
 });

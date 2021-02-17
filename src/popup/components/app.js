@@ -1,7 +1,8 @@
-import React, { Fragment } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import { DeleteTopics } from "./topic_list";
+import { Loading } from "./spinner";
 
 const Div = styled.div`
   width: 300px;
@@ -11,17 +12,30 @@ const Div = styled.div`
 `;
 
 export const App = () => {
+  const [deleting, setDeleting] = useState(false);
   const onDelete = (topics) => {
-    // TODO: ask content script to do deletion.
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        type: "deleteTopics",
+        payload: topics,
+      });
+    });
+    setDeleting(true);
   };
   return (
-    <Fragment>
-      <Div>
-        <h1>Delete By Topic</h1>
-        <h3>In Google Classroom</h3>
-        <p>Check off the topics you want to delete.</p>
-      </Div>
-      <DeleteTopics deleteCallback={onDelete} />
-    </Fragment>
+    <Div>
+      <h1>Delete By Topic</h1>
+      <h3>In Google Classroom</h3>
+      {deleting ? (
+        <>
+          <Loading />
+        </>
+      ) : (
+        <>
+          <p>Check off the topics you want to delete.</p>
+          <DeleteTopics deleteCallback={onDelete} />
+        </>
+      )}
+    </Div>
   );
 };

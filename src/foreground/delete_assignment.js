@@ -63,7 +63,7 @@ export const deleteTopics = (topicNames) => {
    * @param {array} topicNames Array of topic names
    * @returns {array} List of topics that failed to be deleted.
    */
-  failed = [];
+  let failed = [];
   try {
     for (topic in topicNames) {
       deleteTopic(topic);
