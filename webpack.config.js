@@ -20,6 +20,11 @@ module.exports = {
     popup: path.join(__dirname, "src", "popup", "index.js"),
     options: path.join(__dirname, "src", "options", "index.js"),
     background: path.join(__dirname, "src", "background", "index.js"),
+    classroom_content_script: path.join(
+      __dirname,
+      "src",
+      "classroom_content_script.js"
+    ),
   },
   output: {
     path: path.join(__dirname, "build"),

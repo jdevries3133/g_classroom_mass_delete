@@ -5,6 +5,12 @@
   "background": {
     "page": "background.html"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://classroom.google.com/*"],
+      "js": ["classroom_content_script.bundle.js"]
+    }
+  ],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "./icons/96.png",
