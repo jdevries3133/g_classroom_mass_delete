@@ -2,7 +2,7 @@
  * Script running in the context of the classroom tab with access
  * to the classroom dom
  */
-import { deleteAssignment } from "./delete_assignment";
+import { deleteTopics } from "./delete_assignment";
 import { getMany } from "./xpath_utils";
 
 const getTopicElements = () => {
@@ -14,7 +14,12 @@ const getTopicNames = () => {
 };
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  const topicNames = getTopicNames();
-  sendResponse(topicNames);
-  deleteAssignment();
+  switch (request.type) {
+    case "getTopics":
+      const topicNames = getTopicNames();
+      sendResponse(topicNames);
+
+    case "deleteTopics":
+      deleteTopics(request.payload);
+  }
 });

@@ -26,14 +26,10 @@ export const DeleteTopics = () => {
   let [topics, setTopics] = useState([]);
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(
-        tabs[0].id,
-        { type: "documentRequest" },
-        (response) => {
-          console.log(response);
-          setTopics(response);
-        }
-      );
+      chrome.tabs.sendMessage(tabs[0].id, { type: "getTopics" }, (response) => {
+        console.log(response);
+        setTopics(response);
+      });
     });
   }, []);
   return (
