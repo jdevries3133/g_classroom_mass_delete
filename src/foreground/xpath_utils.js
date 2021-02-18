@@ -1,6 +1,7 @@
 const makeXpath = (node) => {
   let allNodes = document.getElementsByTagName("*");
-  for (let segs = []; node && node.nodeType == 1; node = node.parentNode) {
+  let segs;
+  for (segs = []; node && node.nodeType == 1; node = node.parentNode) {
     if (node.hasAttribute("id")) {
       let uniqueIdCount = 0;
       for (let n = 0; n < allNodes.length; n++) {
@@ -38,13 +39,16 @@ const makeXpath = (node) => {
   return segs.length ? "/" + segs.join("/") : null;
 };
 
-export const nodeToXpath = (node, xpath) => {
+export const nodeToXpath = (node, xpath, many) => {
   /**
    * Given a context node and an xpath to describe the route from that
    * node to another, return the resultant node.
+   * @param {node} node DOM node to search from
+   * @param {string} xpath Describes route from node to target
+   * @param {boolean} many Whether the xpath should return one or many nodes.
    */
   const fullXpath = makeXpath(node) + "/" + xpath;
-  return getOne(fullXpath);
+  return many ? getMany(fullXpath) : getOne(fullXpath);
 };
 
 export const getOne = (xpath, contextNode = null) => {
@@ -61,7 +65,6 @@ export const getOne = (xpath, contextNode = null) => {
   if (node) {
     return node;
   }
-  return node;
   throw new Error(`Single node not found for xpath: "${xpath}"`);
 };
 
@@ -90,6 +93,6 @@ export const getMany = (xpath, contextNode = document) => {
   return nodes;
 };
 
-export const getTopicElements = () => {
+export const getTopicRootElements = () => {
   return getMany('//*[@id="c1"]/div/div/div[4]/ol/li/div[1]/div/a');
 };

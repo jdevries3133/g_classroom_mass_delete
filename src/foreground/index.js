@@ -3,10 +3,10 @@
  * to the classroom dom
  */
 import { deleteTopics } from "./delete_assignment";
-import { getTopicElements } from "./xpath_utils";
+import { getTopicRootElements } from "./xpath_utils";
 
 const getTopicNames = () => {
-  return getTopicElements().map((i) => i.innerText);
+  return getTopicRootElements().map((i) => i.innerText);
 };
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -17,8 +17,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       } else if (window.location.pathname[1] !== "w") {
         sendResponse("wrongPage");
       } else {
-        const topicNames = getTopicNames();
-        sendResponse(topicNames);
+        sendResponse(getTopicNames());
       }
       break;
 
