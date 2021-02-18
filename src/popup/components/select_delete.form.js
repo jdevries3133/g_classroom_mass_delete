@@ -25,7 +25,7 @@ const Ul = styled.ul`
     }
   }
 `;
-export const DeleteSelectionForm = ({ topics }) => {
+export const DeleteSelectionForm = ({ topics, deleteCallback }) => {
   let [checkboxState, setCheckboxState] = useState({});
   return (
     <form>
@@ -54,7 +54,7 @@ export const DeleteSelectionForm = ({ topics }) => {
       <input
         onClick={(e) => {
           e.preventDefault();
-          props.deleteCallback(
+          deleteCallback(
             Object.keys(checkboxState).filter((k) => checkboxState[k])
           );
         }}

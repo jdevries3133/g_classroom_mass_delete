@@ -26,17 +26,15 @@ const deleteFirstAssignment = (topicRootNode) => {
    */
   // bring up the three-dot menu
   const relativeXpath = "div[1]/div/div/div/div/div";
+  // TODO: this xpath deletes the topic, not the first assignment beneath it.
   const menu = nodeToXpath(topicRootNode, relativeXpath);
-  console.log(menu);
   menu.click();
   setTimeout(() => {
-    // click on "delete" option
-    throw new Error("Not implemented: remove hard coded xpath");
+    // click on "delete" option (xpath always the same)
     const delete_option = getOne("/html/body/div[11]/div/div/span[2]");
     naturalClick(delete_option);
     setTimeout(() => {
       // confirm delete; this xpath should work for any assgt
-      throw new Error("Not implemented: remove hard coded xpath");
       let confirmDelete = getOne(
         '//*[@id="yDmH0d"]/div[11]/div/div[2]/div[3]/div[2]'
       );
@@ -64,7 +62,13 @@ const selectTopic = (topicName) => {
 };
 
 const deleteTopic = (topicName) => {
-  const node = selectTopic(topicName);
+  let node;
+  try {
+    node = selectTopic(topicName);
+  } catch (e) {
+    // lazy exit condition; if we can't select the topic, it must be gone.
+    return;
+  }
   const commonRootNode = node.parentElement.parentElement.parentElement;
   deleteFirstAssignment(commonRootNode);
 };
@@ -76,11 +80,11 @@ export const deleteTopics = (topicNames) => {
    */
   let failed = [];
   for (let i in topicNames) {
-    // try {
-    deleteTopic(topicNames[i]);
-    // } catch (e) {
-    // console.log(`Failed to delete topic ${topicNames[i]} due to error ${e}`);
-    // failed.push(topicNames[i]);
-    // }
+    try {
+      deleteTopic(topicNames[i]);
+    } catch (e) {
+      console.log(`Failed to delete topic ${topicNames[i]} due to error ${e}`);
+      failed.push(topicNames[i]);
+    }
   }
 };

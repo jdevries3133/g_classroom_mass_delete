@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ContextError } from "./errors";
 import { DeleteSelectionForm } from "./select_delete.form";
 
-export const SelectTopicsToDelete = () => {
+export const SelectTopicsToDelete = (props) => {
   let [contentScriptResponse, setContentScriptResponse] = useState([]);
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -17,7 +17,12 @@ export const SelectTopicsToDelete = () => {
     contentScriptResponse.length > 0 &&
     typeof contentScriptResponse !== "string"
   ) {
-    return <DeleteSelectionForm topics={contentScriptResponse} />;
+    return (
+      <DeleteSelectionForm
+        topics={contentScriptResponse}
+        deleteCallback={props.deleteCallback}
+      />
+    );
   } else {
     return <ContextError errorMsg={contentScriptResponse} />;
   }

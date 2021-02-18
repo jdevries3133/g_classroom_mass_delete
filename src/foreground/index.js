@@ -32,6 +32,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       console.warn(`Unknown message type from popup: ${request.type}`);
   }
 });
-
-// TODO: remove this!!
-setTimeout(() => deleteTopics(["Topic 5"]), 5000);
