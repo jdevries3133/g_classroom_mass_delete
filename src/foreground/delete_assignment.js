@@ -2,7 +2,7 @@
  * Collection of utilities associated with deleting assignments
  */
 
-import { getOne, getTopicElements } from "./xpath_utils";
+import { getOne, getTopicElements, nodeToXpath } from "./xpath_utils";
 
 const naturalClick = (targetNode) => {
   // Simulate a natural mouse-click sequence.
@@ -22,12 +22,12 @@ const deleteFirstAssignment = (topicRootNode) => {
   /**
    * Delete the first assignment given the root node of a topic.
    * This action is repeated until there is nothing left in the topic.
+   * @param {node} topicRootNode DOM node where first assgt will be deleted
    */
   // bring up the three-dot menu
-  throw new Error("Not implemented: remove hard coded xpath");
-  const menu = getOne(
-    "/html/body/div[2]/div/div/main/div/div/div[4]/ol/li[4]/div[2]/div/div/div[3]/ol/li[1]/div/div/div[4]/div/div"
-  );
+  const relativeXpath = "div[1]/div/div/div/div/div";
+  const menu = nodeToXpath(topicRootNode, relativeXpath);
+  console.log(menu);
   menu.click();
   setTimeout(() => {
     // click on "delete" option
@@ -65,7 +65,8 @@ const selectTopic = (topicName) => {
 
 const deleteTopic = (topicName) => {
   const node = selectTopic(topicName);
-  throw new Error("Not implemented");
+  const commonRootNode = node.parentElement.parentElement.parentElement;
+  deleteFirstAssignment(commonRootNode);
 };
 
 export const deleteTopics = (topicNames) => {
@@ -75,11 +76,11 @@ export const deleteTopics = (topicNames) => {
    */
   let failed = [];
   for (let i in topicNames) {
-    try {
-      deleteTopic(topicNames[i]);
-    } catch (e) {
-      console.log(`Failed to delete topic ${topicNames[i]} due to error ${e}`);
-      failed.push(topicNames[i]);
-    }
+    // try {
+    deleteTopic(topicNames[i]);
+    // } catch (e) {
+    // console.log(`Failed to delete topic ${topicNames[i]} due to error ${e}`);
+    // failed.push(topicNames[i]);
+    // }
   }
 };
