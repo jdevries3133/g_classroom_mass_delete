@@ -46,13 +46,8 @@ export const ContextError = ({ errorMsg }) => {
   if (typeof errorMsg === "object" && !errorMsg.length) {
     return <EmptyArray />;
   }
-  switch (errorMsg) {
-    case "wrongPage":
-      return <WrongPage />;
-    case "wrongSite":
-      return <WrongSite />;
-    default:
-      console.warn(`Unknown ContextError type: ${errorMsg}`);
-      return <h2>Error: Please try again</h2>;
+  if (errorMsg === "wrongPage") {
+    return <WrongPage />;
   }
+  return <WrongSite />;
 };
