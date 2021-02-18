@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import { ContextError } from "./errors";
-import { DeleteSelectionForm } from "./delete_selection_form";
+import { DeleteSelectionForm } from "./select_delete.form";
 
-export const DeleteTopics = () => {
+export const SelectTopicsToDelete = () => {
   let [contentScriptResponse, setContentScriptResponse] = useState([]);
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {

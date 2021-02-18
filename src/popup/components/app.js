@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-import { DeleteTopics } from "./topic_list";
+import { SelectTopicsToDelete } from "./select_delete.container";
 import { Loading } from "./spinner";
 
 const Div = styled.div`
@@ -33,7 +33,7 @@ export const App = () => {
       ) : (
         <>
           <p>Check off the topics you want to delete.</p>
-          <DeleteTopics deleteCallback={onDelete} />
+          <SelectTopicsToDelete deleteCallback={onDelete} />
         </>
       )}
     </Div>

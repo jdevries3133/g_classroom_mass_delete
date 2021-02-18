@@ -39,3 +39,7 @@ export const getMany = (xpath) => {
   }
   return nodes;
 };
+
+export const getTopicElements = () => {
+  return getMany('//*[@id="c1"]/div/div/div[4]/ol/li/div[1]/div/a');
+};

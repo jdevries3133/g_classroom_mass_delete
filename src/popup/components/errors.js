@@ -27,8 +27,11 @@ const WrongSite = () => (
 
 const WrongPage = () => (
   <>
-    <h2>Wrong Page!</h2>
-    <p>Oops! Navigate to the classwork tab before using this extension.</p>
+    <h2>Go To Classwork</h2>
+    <p>
+      You are in google classroom, but this is the wrong page. Navigate to the
+      classwork tab before using this extension.
+    </p>
   </>
 );
 

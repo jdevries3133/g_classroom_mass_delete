@@ -2,7 +2,7 @@
  * Collection of utilities associated with deleting assignments
  */
 
-import { getOne } from "./xpath_utils";
+import { getOne, getTopicElements } from "./xpath_utils";
 
 const naturalClick = (targetNode) => {
   // Simulate a natural mouse-click sequence.
@@ -50,7 +50,17 @@ const selectTopic = (topicName) => {
    * @param {string} topicName The name of a topic in the classroom
    * @returns {node} DOM node
    */
-  throw new Error("Not Implemented");
+  const allTopics = getTopicElements();
+  let target;
+  for (let t in allTopics) {
+    if (allTopics[t].innerText === topicName) {
+      target = allTopics[t];
+    }
+  }
+  if (!target) {
+    throw new Error(`Target element for topic ${topicName} not found`);
+  }
+  return target;
 };
 
 const deleteTopic = (topicName) => {
@@ -64,12 +74,12 @@ export const deleteTopics = (topicNames) => {
    * @returns {array} List of topics that failed to be deleted.
    */
   let failed = [];
-  for (let topic in topicNames) {
+  for (let i in topicNames) {
     try {
-      deleteTopic(topic);
+      deleteTopic(topicNames[i]);
     } catch (e) {
-      console.log(`Failed to delete topic ${topic} due to error ${e}`);
-      failed.push(topic);
+      console.log(`Failed to delete topic ${topicNames[i]} due to error ${e}`);
+      failed.push(topicNames[i]);
     }
   }
 };
