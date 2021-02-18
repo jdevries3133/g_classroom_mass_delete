@@ -64,12 +64,12 @@ export const deleteTopics = (topicNames) => {
    * @returns {array} List of topics that failed to be deleted.
    */
   let failed = [];
-  try {
-    for (topic in topicNames) {
+  for (let topic in topicNames) {
+    try {
       deleteTopic(topic);
+    } catch (e) {
+      console.log(`Failed to delete topic ${topic} due to error ${e}`);
+      failed.push(topic);
     }
-  } catch (e) {
-    console.log(`Failed to delete topic ${topic} due to error ${e}`);
-    failed.push(topic);
   }
 };

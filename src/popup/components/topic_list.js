@@ -1,6 +1,8 @@
 import React, { Fragment, useEffect, useState } from "react";
 import styled from "styled-components";
 
+import { ContextError } from "./errors";
+
 const Ul = styled.ul`
   list-style: none;
   padding-left: 10px;
@@ -28,33 +30,37 @@ export const DeleteTopics = (props) => {
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.sendMessage(tabs[0].id, { type: "getTopics" }, (response) => {
-        response ? setTopics(response) : console.warn("Topics are undefined");
+        setTopics(response);
       });
     });
   }, []);
   return (
     <form>
       <Ul>
-        {topics.map((i) => {
-          return (
-            <li key={i}>
-              <input
-                type="checkbox"
-                name={`selectItem${i}`}
-                value={checkboxState[i]}
-                onChange={() => {
-                  setCheckboxState({
-                    ...checkboxState,
-                    [i]: !checkboxState[i],
-                  });
-                }}
-              />
-              <label htmlFor={`selectItem${i}`} key={i}>
-                {i}
-              </label>
-            </li>
-          );
-        })}
+        {topics.length > 0 && typeof topics !== "string" ? (
+          topics.map((i) => {
+            return (
+              <li key={i}>
+                <input
+                  type="checkbox"
+                  name={`selectItem${i}`}
+                  value={checkboxState[i]}
+                  onChange={() => {
+                    setCheckboxState({
+                      ...checkboxState,
+                      [i]: !checkboxState[i],
+                    });
+                  }}
+                />
+                <label htmlFor={`selectItem${i}`} key={i}>
+                  {i}
+                </label>
+              </li>
+            );
+          })
+        ) : (
+          <ContextError errorMsg={topics} />
+        )}
       </Ul>
       <input
         onClick={(e) => {
