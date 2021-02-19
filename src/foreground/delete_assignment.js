@@ -116,8 +116,8 @@ const deleteFirstAssignment = async (topicRootNode) => {
   // bring up the three-dot menu
   const assignmentRoot = firstAssignmentRoot(topicRootNode);
   menuButton(assignmentRoot).click();
-  await sleep(1000)
-  await followThroughDelete() 
+  await sleep(1000);
+  await followThroughDelete();
 };
 
 const deleteTopic = async (topicName) => {
@@ -128,20 +128,20 @@ const deleteTopic = async (topicName) => {
   let node;
   node = selectTopic(topicName);
   const commonRootNode = node.parentElement.parentElement.parentElement;
-  const numTopics = lenTopic(topicName)
+  const numTopics = lenTopic(topicName);
   for (let i = 0; i < numTopics; i++) {
-    console.log(`i = ${i}`)
-    await deleteFirstAssignment(commonRootNode)
-    await sleep(2000)
+    console.log(`i = ${i}`);
+    await deleteFirstAssignment(commonRootNode);
+    await sleep(2000);
   }
   const topicMenu = nodeToXpath(
     commonRootNode,
     "div[1]/div/div/div/div/div",
     false
   );
-  naturalClick(topicMenu)
-  await sleep(1000)
-  await followThroughDelete()
+  naturalClick(topicMenu);
+  await sleep(1000);
+  await followThroughDelete();
 };
 
 export const deleteTopics = async (topicNames) => {
@@ -149,9 +149,10 @@ export const deleteTopics = async (topicNames) => {
    * @param {array} topicNames Array of topic names
    * @returns {array} List of topics that failed to be deleted.
    */
-  // TODO: a fixed 10 second interval is not always going to work
   let failed = [];
-  topicNames.forEach((name, i) => {
+  topicNames.forEach(async (name, i) => {
+    // TODO: these functions are all getting run at the same time.
+    // I think a traditional for loop will fix
     try {
       await deleteTopic(name);
     } catch (e) {
