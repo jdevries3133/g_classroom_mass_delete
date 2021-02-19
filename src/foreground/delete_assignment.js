@@ -126,20 +126,11 @@ const deleteTopic = async (topicName) => {
   let node;
   node = selectTopic(topicName);
   const commonRootNode = node.parentElement.parentElement.parentElement;
-  for (let j = 0; j < 2; j++) {
-    /**
-     * doing this twice makes it a bit more resistant to hangups. If the site
-     * lags and causes topic deletion to miss, most topics will still be
-     * deleted. This creates the equivalent to checking and deleting any
-     * remaining assignments if they exist one more time before deleting the
-     * topic too.
-     */
-    const numTopics = lenTopic(topicName);
-    for (let i = 0; i < numTopics; i++) {
-      await deleteFirstAssignment(commonRootNode);
-      await sleep(2000);
-    }
+  while (lenTopic(topicName)) {
+    await deleteFirstAssignment(commonRootNode);
+    await sleep(2000);
   }
+
   const topicMenu = nodeToXpath(
     commonRootNode,
     "div[1]/div/div/div/div/div",
