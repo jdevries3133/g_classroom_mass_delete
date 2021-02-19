@@ -1,42 +1,21 @@
+/**
+ * Various functions for traversing the DOM with xpaths.
+ */
+
 const makeXpath = (node) => {
-  let allNodes = document.getElementsByTagName("*");
-  let segs;
-  for (segs = []; node && node.nodeType == 1; node = node.parentNode) {
-    if (node.hasAttribute("id")) {
-      let uniqueIdCount = 0;
-      for (let n = 0; n < allNodes.length; n++) {
-        if (allNodes[n].hasAttribute("id") && allNodes[n].id == node.id)
-          uniqueIdCount++;
-        if (uniqueIdCount > 1) break;
-      }
-      if (uniqueIdCount == 1) {
-        segs.unshift('id("' + node.getAttribute("id") + '")');
-        return segs.join("/");
-      } else {
-        segs.unshift(
-          node.localName.toLowerCase() +
-            '[@id="' +
-            node.getAttribute("id") +
-            '"]'
-        );
-      }
-    } else if (node.hasAttribute("class")) {
-      segs.unshift(
-        node.localName.toLowerCase() +
-          '[@class="' +
-          node.getAttribute("class") +
-          '"]'
+  if (node.tagName == "HTML") return "/html[1]";
+  if (node === document.body) return "/html[1]/body[1]";
+
+  var ix = 0;
+  var siblings = node.parentNode.childNodes;
+  for (var i = 0; i < siblings.length; i++) {
+    var sibling = siblings[i];
+    if (sibling === node)
+      return (
+        makeXpath(node.parentNode) + "/" + node.tagName + "[" + (ix + 1) + "]"
       );
-    } else {
-      let i;
-      let sib;
-      for (i = 1, sib = node.previousSibling; sib; sib = sib.previousSibling) {
-        if (sib.localName == node.localName) i++;
-      }
-      segs.unshift(node.localName.toLowerCase() + "[" + i + "]");
-    }
+    if (sibling.nodeType === 1 && sibling.tagName === node.tagName) ix++;
   }
-  return segs.length ? "/" + segs.join("/") : null;
 };
 
 export const nodeToXpath = (node, xpath, many) => {
@@ -47,8 +26,8 @@ export const nodeToXpath = (node, xpath, many) => {
    * @param {string} xpath Describes route from node to target
    * @param {boolean} many Whether the xpath should return one or many nodes.
    */
-  const fullXpath = makeXpath(node) + "/" + xpath;
-  return many ? getMany(fullXpath) : getOne(fullXpath);
+  const fullXp = makeXpath(node) + "/" + xpath;
+  return many ? getMany(fullXp) : getOne(fullXp);
 };
 
 export const getOne = (xpath, contextNode = null) => {

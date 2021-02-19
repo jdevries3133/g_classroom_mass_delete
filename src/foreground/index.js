@@ -22,8 +22,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       break;
 
     case "deleteTopics":
-      console.log(request.payload);
       deleteTopics(request.payload);
+      console.log("All topics deleted");
       sendResponse();
       break;
 
