@@ -3,8 +3,8 @@
  */
 
 const makeXpath = (node) => {
-  if (node.tagName == "HTML") return "/html[1]";
-  if (node === document.body) return "/html[1]/body[1]";
+  if (node.tagName == "HTML") return "/HTML[1]";
+  if (node === document.body) return "/HTML[1]/BODY[1]";
 
   var ix = 0;
   var siblings = node.parentNode.childNodes;
@@ -27,7 +27,8 @@ export const nodeToXpath = (node, xpath, many) => {
    * @param {boolean} many Whether the xpath should return one or many nodes.
    */
   const fullXp = makeXpath(node) + "/" + xpath;
-  return many ? getMany(fullXp) : getOne(fullXp);
+  const rval =  many ? getMany(fullXp) : getOne(fullXp);
+  return rval
 };
 
 export const getOne = (xpath, contextNode = null) => {

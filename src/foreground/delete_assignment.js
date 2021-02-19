@@ -12,6 +12,10 @@ import { getOne, nodeToXpath, getTopicRootElements } from "./xpath_utils";
  *
  */
 
+const sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 const naturalClick = (targetNode) => {
   // Simulate a natural mouse-click sequence.
   triggerMouseEvent(targetNode, "mouseover");
@@ -35,37 +39,35 @@ const menuButton = (assignmentRoot) => {
   return menuB;
 };
 
-const followThroughDelete = () => {
+const followThroughDelete = async () => {
   /**
    * Once the context menu (the one with three dots) has been brought up,
    * the process to click and confirm delete is identical for topics and
    * assignments alike.
    */
-  setTimeout(() => {
-    // click on "delete" option (xpath always the same)
-    let deleteOption;
-    try {
-      deleteOption = getOne("/html/body/div[11]/div/div/span[2]");
-    } catch (e) {
-      console.warn("deleteOption selection failed; retrying with div12");
-      deleteOption = getOne("/html/body/div[12]/div/div/span[2]");
-    }
-    naturalClick(deleteOption);
-    setTimeout(() => {
-      let confirmDelete;
-      try {
-        confirmDelete = getOne(
-          '//*[@id="yDmH0d"]/div[11]/div/div[2]/div[3]/div[2]'
-        );
-      } catch (e) {
-        console.warn("confirmDelete selection failed; retrying with div12");
-        confirmDelete = getOne(
-          '//*[@id="yDmH0d"]/div[12]/div/div[2]/div[3]/div[2]'
-        );
-      }
-      confirmDelete.click();
-    }, 1500);
-  });
+
+  // click on "delete" option (xpath always the same)
+  let deleteOption;
+  try {
+    deleteOption = getOne("/html/body/div[11]/div/div/span[2]");
+  } catch (e) {
+    console.warn("deleteOption selection failed; retrying with div12");
+    deleteOption = getOne("/html/body/div[12]/div/div/span[2]");
+  }
+  naturalClick(deleteOption);
+  await sleep(1500);
+  let confirmDelete;
+  try {
+    confirmDelete = getOne(
+      '//*[@id="yDmH0d"]/div[11]/div/div[2]/div[3]/div[2]'
+    );
+  } catch (e) {
+    console.warn("confirmDelete selection failed; retrying with div12");
+    confirmDelete = getOne(
+      '//*[@id="yDmH0d"]/div[12]/div/div[2]/div[3]/div[2]'
+    );
+  }
+  confirmDelete.click();
 };
 
 const lenTopic = (topicName) => {
@@ -105,7 +107,7 @@ const selectTopic = (topicName) => {
  *
  */
 
-const deleteFirstAssignment = (topicRootNode) => {
+const deleteFirstAssignment = async (topicRootNode) => {
   /**
    * Delete the first assignment given the root node of a topic.
    * This action is repeated until there is nothing left in the topic.
@@ -114,10 +116,11 @@ const deleteFirstAssignment = (topicRootNode) => {
   // bring up the three-dot menu
   const assignmentRoot = firstAssignmentRoot(topicRootNode);
   menuButton(assignmentRoot).click();
-  setTimeout(() => followThroughDelete(), 1000);
+  await sleep(1000)
+  await followThroughDelete() 
 };
 
-const deleteTopic = (topicName) => {
+const deleteTopic = async (topicName) => {
   /**
    * Delete all the assignments beneath a topic, then delete the topic
    * itself.
@@ -125,21 +128,23 @@ const deleteTopic = (topicName) => {
   let node;
   node = selectTopic(topicName);
   const commonRootNode = node.parentElement.parentElement.parentElement;
-  let i;
-  for (i = 0; i < lenTopic(topicName); i++) {
-    setTimeout(() => deleteFirstAssignment(commonRootNode), i * 6000);
+  const numTopics = lenTopic(topicName)
+  for (let i = 0; i < numTopics; i++) {
+    console.log(`i = ${i}`)
+    await deleteFirstAssignment(commonRootNode)
+    await sleep(2000)
   }
-  setTimeout(() => {
-    topicMenu = nodeToXpath(
-      commonRootNode,
-      "div[1]/div/div/div/div/div",
-      false
-    );
-    setTimeout(() => followThroughDelete(), 1000);
-  }, (i + 1) * 6000);
+  const topicMenu = nodeToXpath(
+    commonRootNode,
+    "div[1]/div/div/div/div/div",
+    false
+  );
+  naturalClick(topicMenu)
+  await sleep(1000)
+  await followThroughDelete()
 };
 
-export const deleteTopics = (topicNames) => {
+export const deleteTopics = async (topicNames) => {
   /**
    * @param {array} topicNames Array of topic names
    * @returns {array} List of topics that failed to be deleted.
@@ -147,13 +152,11 @@ export const deleteTopics = (topicNames) => {
   // TODO: a fixed 10 second interval is not always going to work
   let failed = [];
   topicNames.forEach((name, i) => {
-    setTimeout(() => {
-      try {
-        deleteTopic(name);
-      } catch (e) {
-        console.warn(`Topic "${name}" failed due to ${e}`);
-        failed.push(name);
-      }
-    }, 10000 * i);
+    try {
+      await deleteTopic(name);
+    } catch (e) {
+      console.warn(`Topic "${name}" failed due to ${e}`);
+      failed.push(name);
+    }
   });
 };
