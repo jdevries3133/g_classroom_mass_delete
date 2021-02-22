@@ -14,7 +14,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     case "getTopics":
       if (window.location.hostname !== "classroom.google.com") {
         sendResponse("wrongSite");
-      } else if (window.location.pathname[1] !== "w") {
+      } else if (!window.location.href.split("/").includes("w")) {
         sendResponse("wrongPage");
       } else {
         sendResponse(getTopicNames());

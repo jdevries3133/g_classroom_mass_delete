@@ -4,7 +4,10 @@
 
 import { getOne, nodeToXpath, getTopicRootElements } from "./xpath_utils";
 
-let SLEEP_CORRECTION = 0.2;
+// adjust all sleep call times by this constant
+let SLEEP_CORRECTION = 0.5;
+// reduce sleep_correction if we are on an error-free streak
+let SUCCESS_STREAK = 0;
 
 /******************************************************************************
  *
@@ -67,7 +70,7 @@ const followThroughDelete = async () => {
   }
   try {
     naturalClick(deleteOption);
-    await sleep(1500);
+    await sleep(800);
     let confirmDelete;
     try {
       confirmDelete = getOne(
@@ -132,7 +135,7 @@ const deleteFirstAssignment = async (topicRootNode) => {
   // bring up the three-dot menu
   const assignmentRoot = firstAssignmentRoot(topicRootNode);
   menuButton(assignmentRoot).click();
-  await sleep(1000);
+  await sleep(500);
   return await followThroughDelete();
 };
 
@@ -149,20 +152,27 @@ const deleteTopic = async (topicName) => {
       // refresh rootNode if deleteFirstAssignment fails
       node = selectTopic(topicName);
       SLEEP_CORRECTION *= 1.3;
+    } else {
+      SUCCESS_STREAK += 1;
+      if (SUCCESS_STREAK > 15) {
+        SLEEP_CORRECTION *= 0.7;
+        SUCCESS_STREAK = 0;
+      }
     }
+    console.log("sleep correction", SLEEP_CORRECTION);
     await sleep(2000);
   }
 
   const topicMenu = nodeToXpath(node, "div[1]/div/div/div/div/div", false);
   naturalClick(topicMenu);
-  await sleep(1000);
+  await sleep(800);
   let success = await followThroughDelete();
   if (success) {
-    await sleep(2000);
+    await sleep(1000);
     return true;
   } else {
-    console.log("recursing");
     SLEEP_CORRECTION *= 1.3;
+    await sleep(1000);
     deleteTopic(topicName);
   }
 };
