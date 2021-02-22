@@ -168,7 +168,7 @@ const deleteTopic = async (topicName) => {
   await sleep(800);
   let success = await followThroughDelete();
   if (success) {
-    await sleep(1000);
+    await sleep(2000);
     return true;
   } else {
     SLEEP_CORRECTION *= 1.3;
