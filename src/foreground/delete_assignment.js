@@ -159,7 +159,6 @@ const deleteTopic = async (topicName) => {
         SUCCESS_STREAK = 0;
       }
     }
-    console.log("sleep correction", SLEEP_CORRECTION);
     await sleep(2000);
   }
 
