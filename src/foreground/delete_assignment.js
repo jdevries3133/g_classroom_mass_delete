@@ -4,6 +4,8 @@
 
 import { getOne, nodeToXpath, getTopicRootElements } from "./xpath_utils";
 
+let SLEEP_CORRECTION = 0.2;
+
 /******************************************************************************
  *
  * UTILITY FUNCTIONS
@@ -13,7 +15,12 @@ import { getOne, nodeToXpath, getTopicRootElements } from "./xpath_utils";
  */
 
 const sleep = (ms) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  /**
+   * @param {number} ms milliseconds multiplied by the SLEEP_CORRECTION constant;
+   *                    which is typically 1.
+   * @returns {Promise}
+   */
+  return new Promise((resolve) => setTimeout(resolve, ms * SLEEP_CORRECTION));
 };
 
 const naturalClick = (targetNode) => {
@@ -44,28 +51,38 @@ const followThroughDelete = async () => {
    * Once the context menu (the one with three dots) has been brought up,
    * the process to click and confirm delete is identical for topics and
    * assignments alike.
+   * @returns {boolean} whether the action succeeded
    */
 
   // click on "delete" option (xpath always the same)
   let deleteOption;
   try {
     deleteOption = getOne("/html/body/div[11]/div/div/span[2]");
-  } catch (e) {
-    deleteOption = getOne("/html/body/div[12]/div/div/span[2]");
+  } catch {
+    try {
+      deleteOption = getOne("/html/body/div[12]/div/div/span[2]");
+    } catch {
+      return false;
+    }
   }
-  naturalClick(deleteOption);
-  await sleep(1500);
-  let confirmDelete;
   try {
-    confirmDelete = getOne(
-      '//*[@id="yDmH0d"]/div[11]/div/div[2]/div[3]/div[2]'
-    );
+    naturalClick(deleteOption);
+    await sleep(1500);
+    let confirmDelete;
+    try {
+      confirmDelete = getOne(
+        '//*[@id="yDmH0d"]/div[11]/div/div[2]/div[3]/div[2]'
+      );
+    } catch (e) {
+      confirmDelete = getOne(
+        '//*[@id="yDmH0d"]/div[12]/div/div[2]/div[3]/div[2]'
+      );
+    }
+    confirmDelete.click();
+    return true;
   } catch (e) {
-    confirmDelete = getOne(
-      '//*[@id="yDmH0d"]/div[12]/div/div[2]/div[3]/div[2]'
-    );
+    return false;
   }
-  confirmDelete.click();
 };
 
 const lenTopic = (topicName) => {
@@ -74,9 +91,8 @@ const lenTopic = (topicName) => {
    * @returns {number} of posts under that topic
    */
   const node = selectTopic(topicName);
-  const commonRootNode = node.parentElement.parentElement.parentElement;
   const assignmentNodes = nodeToXpath(
-    commonRootNode,
+    node,
     "div[2]/div/div/div[3]/ol/li",
     true
   );
@@ -93,7 +109,8 @@ const selectTopic = (topicName) => {
   if (!target || target.innerText !== topicName) {
     throw new Error(`Target element for topic ${topicName} not found`);
   }
-  return target;
+  // walk up to topic root node from the element with topic name
+  return target.parentElement.parentElement.parentElement;
 };
 
 /******************************************************************************
@@ -110,12 +127,13 @@ const deleteFirstAssignment = async (topicRootNode) => {
    * Delete the first assignment given the root node of a topic.
    * This action is repeated until there is nothing left in the topic.
    * @param {node} topicRootNode DOM node where first assgt will be deleted
+   * @returns {boolean} whether or not the action was successful
    */
   // bring up the three-dot menu
   const assignmentRoot = firstAssignmentRoot(topicRootNode);
   menuButton(assignmentRoot).click();
   await sleep(1000);
-  await followThroughDelete();
+  return await followThroughDelete();
 };
 
 const deleteTopic = async (topicName) => {
@@ -125,36 +143,36 @@ const deleteTopic = async (topicName) => {
    */
   let node;
   node = selectTopic(topicName);
-  const commonRootNode = node.parentElement.parentElement.parentElement;
   while (lenTopic(topicName)) {
-    await deleteFirstAssignment(commonRootNode);
+    const successful = await deleteFirstAssignment(node);
+    if (!successful) {
+      // refresh rootNode if deleteFirstAssignment fails
+      node = selectTopic(topicName);
+      SLEEP_CORRECTION *= 1.3;
+    }
     await sleep(2000);
   }
 
-  const topicMenu = nodeToXpath(
-    commonRootNode,
-    "div[1]/div/div/div/div/div",
-    false
-  );
+  const topicMenu = nodeToXpath(node, "div[1]/div/div/div/div/div", false);
   naturalClick(topicMenu);
   await sleep(1000);
-  await followThroughDelete();
-  await sleep(2000);
+  let success = await followThroughDelete();
+  if (success) {
+    await sleep(2000);
+    return true;
+  } else {
+    console.log("recursing");
+    SLEEP_CORRECTION *= 1.3;
+    deleteTopic(topicName);
+  }
 };
 
 export const deleteTopics = async (topicNames) => {
   /**
    * @param {array} topicNames Array of topic names
-   * @returns {array} List of topics that failed to be deleted.
    */
-  let failed = [];
   for (let i = 0; i < topicNames.length; i++) {
-    try {
-      await deleteTopic(topicNames[i]);
-    } catch (e) {
-      console.warn(`Topic "${topicNames[i]}" failed due to ${e}`);
-      failed.push(topicNames[i]);
-    }
+    await deleteTopic(topicNames[i]);
   }
   console.info("All topis deleted.");
 };

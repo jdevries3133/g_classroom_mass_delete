@@ -39,7 +39,7 @@ def make_assgt(*, make_topic: bool, topic_name="Default Topic Name") -> None:
 
 if __name__ == '__main__':
     pg.click(B_POS['start'])
-    for i in range(45, 0, -1):
+    for i in range(100, 0, -1):
         if i % 2 == 0:
             make_assgt(
                 make_topic=True,
